@@ -1,34 +1,57 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { remixContent } from './utils/api'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [input, setInput] = useState<string>('')
+  const [output, setOutput] = useState<string>('')
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  const handleRemix = async () => {
+    if (!input.trim()) return
+    
+    setIsLoading(true)
+    try {
+      const remixedContent = await remixContent(input)
+      setOutput(remixedContent)
+    } catch (error) {
+      console.error('Error:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Content Remix Tool</h1>
+      
+      <div className="grid gap-4 md:grid-cols-2">
+        {/* Input Section */}
+        <div className="p-4 border rounded">
+          <textarea
+            className="w-full h-48 p-2 border rounded"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Paste your content here..."
+          />
+        </div>
+
+        {/* Output Section */}
+        <div className="p-4 border rounded">
+          <div className="w-full h-48 p-2 border rounded bg-gray-50">
+            {isLoading ? 'Loading...' : (output || 'Remixed content will appear here...')}
+          </div>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+
+      {/* Remix Button */}
+      <button 
+        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
+        onClick={handleRemix}
+        disabled={isLoading || !input.trim()}
+      >
+        {isLoading ? 'Remixing...' : 'Remix Content'}
+      </button>
+    </div>
   )
 }
 
