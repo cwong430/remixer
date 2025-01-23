@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { remixText } from './api/claude'
 
 function App() {
   const [inputText, setInputText] = useState('')
@@ -8,15 +9,8 @@ function App() {
   const handleRemix = async () => {
     setIsLoading(true)
     try {
-      const response = await fetch('/api/remix', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ text: inputText }),
-      })
-      const data = await response.json()
-      setOutputText(data.remixedText)
+      const remixedText = await remixText(inputText)
+      setOutputText(remixedText)
     } catch (error) {
       console.error('Error:', error)
       setOutputText('Error occurred while remixing text')
