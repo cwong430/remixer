@@ -1,34 +1,57 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [inputText, setInputText] = useState('')
+  const [outputText, setOutputText] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleRemix = async () => {
+    setIsLoading(true)
+    try {
+      const response = await fetch('/api/remix', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: inputText }),
+      })
+      const data = await response.json()
+      setOutputText(data.remixedText)
+    } catch (error) {
+      console.error('Error:', error)
+      setOutputText('Error occurred while remixing text')
+    }
+    setIsLoading(false)
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    <div className="min-h-screen bg-gray-100 p-8">
+      <div className="max-w-2xl mx-auto space-y-6">
+        <h1 className="text-3xl font-bold text-center">Content Remix Tool</h1>
+        
+        <textarea
+          className="w-full h-40 p-4 border rounded-lg shadow-sm"
+          placeholder="Paste your text here..."
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+        />
+
+        <button
+          className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 disabled:opacity-50"
+          onClick={handleRemix}
+          disabled={!inputText || isLoading}
+        >
+          {isLoading ? 'Remixing...' : 'Remix Content'}
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+
+        {outputText && (
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <h2 className="font-semibold mb-2">Remixed Output:</h2>
+            <p className="whitespace-pre-wrap">{outputText}</p>
+          </div>
+        )}
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </div>
   )
 }
 
