@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { remixText } from './api/claude'
+import { remixToTweet } from './api/claude'
 
 function App() {
   const [inputText, setInputText] = useState('')
@@ -9,7 +9,7 @@ function App() {
   const handleRemix = async () => {
     setIsLoading(true)
     try {
-      const remixedText = await remixText(inputText)
+      const remixedText = await remixToTweet(inputText)
       setOutputText(remixedText)
     } catch (error) {
       console.error('Error:', error)
