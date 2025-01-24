@@ -54,13 +54,60 @@ function App() {
               </svg>
               Remixing...
             </span>
-          ) : 'Remix Content'}
+          ) : 'Generate Tweets'}
         </button>
 
         {outputText && (
-          <div className="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100">
-            <h2 className="font-semibold text-lg text-gray-800 mb-3">Remixed Output:</h2>
-            <p className="whitespace-pre-wrap text-gray-700">{outputText}</p>
+          <div className="space-y-4">
+            <h2 className="font-semibold text-lg text-gray-800">Remixed Output:</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {outputText
+                .split('TWEET:')
+                .filter(tweet => tweet.trim().length > 0)
+                .map((tweet, index) => {
+                  const tweetText = tweet.trim();
+                  const charsRemaining = 280 - tweetText.length;
+                  const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+                  
+                  return (
+                    <div 
+                      key={index} 
+                      className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 
+                                 hover:shadow-md hover:border-blue-300 transition-all 
+                                 transform hover:-translate-y-1"
+                    >
+                      <div className="space-y-4">
+                        <p className="text-gray-700">{tweetText}</p>
+                        
+                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                          <span className={`text-sm ${
+                            charsRemaining < 20 ? 'text-red-500' : 'text-gray-500'
+                          }`}>
+                            {charsRemaining} characters remaining
+                          </span>
+                          
+                          <a
+                            href={tweetUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 hover:text-blue-600 flex items-center gap-1 text-sm"
+                          >
+                            <svg 
+                              xmlns="http://www.w3.org/2000/svg" 
+                              className="h-4 w-4" 
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                            </svg>
+                            Tweet
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
           </div>
         )}
       </div>
