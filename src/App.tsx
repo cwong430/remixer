@@ -25,7 +25,7 @@ function App() {
           Content Remix Tool
         </h1>
         <p className="text-center text-gray-600 mb-6">
-          Transform your text with AI-powered creativity
+          Remix your text into tweets
         </p>
         
         <textarea
@@ -66,6 +66,17 @@ function App() {
                 .filter(tweet => tweet.trim().length > 0)
                 .map((tweet, index) => {
                   const tweetText = tweet.trim();
+                  const sentences = tweetText
+                    .split(/(?<=[.!?])\s+/)
+                    .filter(sentence => sentence.trim().length > 0)
+                    .map(sentence => {
+                      // If sentence doesn't end with ! or ?, make sure it ends with a period
+                      const trimmedSentence = sentence.trim();
+                      if (!trimmedSentence.endsWith('!') && !trimmedSentence.endsWith('?')) {
+                        return trimmedSentence.endsWith('.') ? trimmedSentence : trimmedSentence + '.';
+                      }
+                      return trimmedSentence;
+                    });
                   const charsRemaining = 280 - tweetText.length;
                   const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
                   
@@ -77,7 +88,16 @@ function App() {
                                  transform hover:-translate-y-1"
                     >
                       <div className="space-y-4">
-                        <p className="text-gray-700">{tweetText}</p>
+                        <div className="space-y-4">
+                          {sentences.map((sentence, sentenceIndex) => (
+                            <p 
+                              key={sentenceIndex} 
+                              className="text-gray-700 whitespace-pre-line leading-relaxed"
+                            >
+                              {sentence}
+                            </p>
+                          ))}
+                        </div>
                         
                         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                           <span className={`text-sm ${
