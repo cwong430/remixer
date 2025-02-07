@@ -10,6 +10,8 @@ interface EditableTweetProps {
   isEditing?: boolean
 }
 
+const MAX_CHARS = 280
+
 export function EditableTweet({ 
   content, 
   onSave, 
@@ -20,44 +22,21 @@ export function EditableTweet({
   isEditing = false
 }: EditableTweetProps) {
   const [editedContent, setEditedContent] = useState(content)
-  const [charsRemaining, setCharsRemaining] = useState(280 - content.length)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
     if (isEditing && textareaRef.current) {
-      adjustTextareaHeight()
+      const textarea = textareaRef.current
+      textarea.style.height = 'auto'
+      textarea.style.height = `${textarea.scrollHeight + 2}px`
     }
   }, [isEditing, editedContent])
 
-  const adjustTextareaHeight = () => {
-    const textarea = textareaRef.current
-    if (textarea) {
-      // Reset height to allow proper scrollHeight calculation
-      textarea.style.height = 'auto'
-      // Set the height to match the content
-      textarea.style.height = `${textarea.scrollHeight}px`
-      // Add a small buffer to prevent flickering
-      textarea.style.height = `${textarea.scrollHeight + 2}px`
-    }
-  }
-
   const handleSave = () => {
-    if (editedContent.trim() && onSave) {
-      onSave(editedContent.trim())
+    const trimmedContent = editedContent.trim()
+    if (trimmedContent && onSave) {
+      onSave(trimmedContent)
     }
-  }
-
-  const handleCancel = () => {
-    setEditedContent(content)
-    if (onCancel) {
-      onCancel()
-    }
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newContent = e.target.value
-    setEditedContent(newContent)
-    setCharsRemaining(280 - newContent.length)
   }
 
   return (
@@ -67,22 +46,25 @@ export function EditableTweet({
           <textarea
             ref={textareaRef}
             value={editedContent}
-            onChange={handleChange}
+            onChange={(e) => setEditedContent(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500 
                      focus:ring-1 focus:ring-blue-500 outline-none resize-none"
-            maxLength={280}
+            maxLength={MAX_CHARS}
             autoFocus
             style={{ overflow: 'hidden' }}
           />
           <div className="flex justify-between items-center">
             <span className={`text-sm ${
-              charsRemaining < 20 ? 'text-red-500' : 'text-gray-500'
+              MAX_CHARS - editedContent.length < 20 ? 'text-red-500' : 'text-gray-500'
             }`}>
-              {charsRemaining} characters remaining
+              {MAX_CHARS - editedContent.length} characters remaining
             </span>
             <div className="space-x-2">
               <button
-                onClick={handleCancel}
+                onClick={() => {
+                  setEditedContent(content)
+                  onCancel?.()
+                }}
                 className="text-gray-500 hover:text-gray-700 text-sm"
               >
                 Cancel
