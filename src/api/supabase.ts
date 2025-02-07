@@ -93,4 +93,19 @@ export async function deleteSavedTweet(id: number) {
   }
   
   return true
+}
+
+// Update a tweet
+export async function updateTweet(id: number, content: string) {
+  const { error } = await supabase
+    .from('saved_tweets')
+    .update({ content })
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Error updating tweet:', error.message)
+    return false
+  }
+  
+  return true
 } 
