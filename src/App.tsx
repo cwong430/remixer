@@ -1,10 +1,14 @@
 import { useState } from 'react'
 import { remixToTweet } from './api/claude'
+import { saveTweet } from './api/supabase'
+import { SavedTweets } from './components/SavedTweets'
 
 function App() {
   const [inputText, setInputText] = useState('')
   const [outputText, setOutputText] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isPanelOpen, setIsPanelOpen] = useState(true)
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   const handleRemix = async () => {
     setIsLoading(true)
@@ -16,6 +20,13 @@ function App() {
       setOutputText('Error occurred while remixing text')
     }
     setIsLoading(false)
+  }
+
+  const handleSaveTweet = async (content: string) => {
+    const success = await saveTweet(content)
+    if (success) {
+      setRefreshTrigger(prev => prev + 1)
+    }
   }
 
   return (
@@ -106,22 +117,34 @@ function App() {
                             {charsRemaining} characters remaining
                           </span>
                           
-                          <a
-                            href={tweetUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-500 hover:text-blue-600 flex items-center gap-1 text-sm"
-                          >
-                            <svg 
-                              xmlns="http://www.w3.org/2000/svg" 
-                              className="h-4 w-4" 
-                              fill="currentColor"
-                              viewBox="0 0 24 24"
+                          <div className="flex items-center gap-4">
+                            <button
+                              onClick={() => handleSaveTweet(tweetText)}
+                              className="text-green-500 hover:text-green-600 flex items-center gap-1 text-sm"
                             >
-                              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                            </svg>
-                            Tweet
-                          </a>
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                              </svg>
+                              Save
+                            </button>
+
+                            <a
+                              href={tweetUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-500 hover:text-blue-600 flex items-center gap-1 text-sm"
+                            >
+                              <svg 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                className="h-4 w-4" 
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                              </svg>
+                              Tweet
+                            </a>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -131,6 +154,12 @@ function App() {
           </div>
         )}
       </div>
+
+      <SavedTweets 
+        isPanelOpen={isPanelOpen}
+        setIsPanelOpen={setIsPanelOpen}
+        refreshTrigger={refreshTrigger}
+      />
     </div>
   )
 }

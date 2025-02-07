@@ -20,11 +20,10 @@ const remixToTweetPrompt = `
   IMPORTANT FORMATTING INSTRUCTIONS:
   1. Return at least 5 tweets.
   2. Each tweet MUST start with "TWEET: " (including the space after the colon)
-  3. Each sentence inside a tweet MUST be on a new line
-  4. Each tweet MUST be on a new line
-  5. Each tweet MUST be less than 280 characters
-  6. Do not use hashtags or other social media specific formatting
-  7. Do not number the tweets or add any other text
+  3. Each tweet MUST be on a new line
+  4. Each tweet MUST be less than 280 characters
+  5. Do not use hashtags or other social media specific formatting
+  6. Do not number the tweets or add any other text
   
   Example format:
   TWEET: First tweet here
